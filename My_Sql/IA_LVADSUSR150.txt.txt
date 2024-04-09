@@ -1,0 +1,117 @@
+1ans)
+select avg(dataused)
+from customerinteractions;
+
+/*avg data usage is 2.428gb*/
+
+select customerid
+from customerinteractions
+where year='2024' and month='march' and dataused>'2.428';
+
+
+
+2ans)
+select customerid
+from customerinteractions
+where month='march' and CallDuration>(select distinct(callduration)
+                                      from customerinteractions
+                                      where month='february');
+
+
+3ans)
+
+select customerid
+from customerinteractions
+where month='march' and MessageCount<(select distinct(messagecount)
+				      from customerinteractions
+                                      where month='february');
+union
+select customerid
+from customerinteractions
+where month='march' and dataused>(select distinct(dataused)
+				  from customerinteractions
+                                  where month='february');
+
+
+
+4ans)
+
+select sum(totalsalesamount)
+from quarterlysales
+group by ProductTypeID having ProductTypeID='1';
+
+
+5ans)
+
+select producttypeid
+from quarterlysales
+where quarter='Q1' and TotalSalesAmount = (select max(totalsalesamount)
+                                         from quarterlysales);
+
+
+6ans)
+
+select (totalsalesamount/unitssold) as avg_price_per_unitssold
+from quarterlysales
+where ProductTypeID='1' and quarter='q2' and year='2024';
+
+
+
+7ans)
+
+select avg(consumptionkwh)
+from sectorenergyconsumption
+where EnergySource in ('solar','wind');
+/**avg energy consumption of renewable energy sources is 116666.667**/
+select distinct(region)
+from sectorenergyconsumption
+where month='March' and year='2024' and ConsumptionKWh>116666.667 and EnergySource
+in ('solar','wind');
+
+
+
+8ans)
+
+
+select sector 
+from sectorenergyconsumption
+where month='march' and ConsumptionKWh>(select distinct(consumptionkwh)
+				        from sectorenergyconsumption
+                                        where month='february');
+
+
+
+
+9ans)
+
+select consumptionkwh
+from sectorenergyconsumption
+where energysource='fossil fuels';
+
+select sum(consumptionkwh)
+from sectorenergyconsumption
+where energysource in ('solar','wind');
+
+
+10ans)
+
+select avg(feedbackscore)
+from insuranceactivities;
+/**avg feedback score is 8**/
+select customername
+from insuranceactivities
+where FeedbackScore>8 or Investigation='no';
+
+
+11ans)
+
+select sum(annualpremium)
+from insuranceactivities
+where ClaimsCount>=1 and FeedbackScore>8;
+
+
+12ans)
+
+select PolicyType,avg(feedbackscore),count(ClaimsCount)
+from insuranceactivities
+group by policytype;

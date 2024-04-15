@@ -1,0 +1,177 @@
+1ans)
+
+select p.product_category,avg(sr.sales_amount)
+from products p join sales_records sr using(product_id)
+group by p.product_category having sr.sales_date<=date_sub(cur_date(),interval 1 month);
+
+
+2ans)
+
+select p.product_id,p.product_name,sum(sr.sales_amount),rank()
+over(partition by sr.sales_amount order by sr.sales_amount desc limit 3)
+from products p join sales_records sr using(product_id)
+where year(sales_date)=extract(year,cur_date);
+
+
+
+
+3ans)
+
+select c.customer_id,c.customer_name,percent_rank()
+over(partition by c.customer_id order by sr.sales_amount) as percent_contribution,
+rank() over(partition by c.customer_id order by sr.sales_amount desc) as rank_of_customer
+from customers c join sales_records sr using(customer_id);
+
+
+
+4ans)
+
+select customer_name,count(sale_id) as count,
+case 
+when count<4 and sale_date<=(date_sub(cur_date(),interval 6 months) then 'consistent buyer'
+else 'occassional buyer'
+end as frequency_status
+from customers c join sales_records using(customer_id)
+group by customer.name;
+
+
+
+
+5ans)
+
+select departure_airport,arrival_airport,avg(base_price)
+from flights
+group by departure_airport,arrival_airport;
+
+
+
+6ans)
+
+select f.flight_number,f.departure_date,count(t.ticket_id),sum(t.ticket_price)
+from flights f join tickets t using(flight_id)
+group by f.flight_number,f.departure_date
+order by sum(t.ticket_price) desc;
+
+
+
+7ans)
+
+select month(ticket_date),count(ticket_id),sum(ticket_id)
+from tickets
+group by month(ticket_date)
+order by count(ticket_id) desc
+limit 1;
+
+
+
+8ans)
+
+select month(ticket_date),count(ticket_id),sum(ticket_id)
+from tickets
+group by month(ticket_date)
+order by count(ticket_id) desc
+limit 1;
+
+
+9ans)
+
+select player_id,game_id,avg(minute(play_date))
+from playerscores 
+group by player_id,game_id
+order by avg(minute(playdate)) desc;
+
+
+10ans)
+
+select g.game_id,g.game_name,count(pl.player_id)
+from games g join playerscores ps using(game_id) join players pl using(player_id)
+group by g.game_id,g.game_name
+order by count(pl.player_id) desc
+limit 3;
+
+
+11ans)
+
+select g.game_id,g.game_name,avg(ps.score),max(ps.score),count(pl.player_id)
+from games g join playerscores ps using(game_id) join players pl using(player_id)
+group by g.game_id,g.game_name;
+
+
+12ans)
+
+select ps.player_id,p.player_name,p.registration_date,ps.play_date
+from playerscores ps join players p using(player_id)
+where ps.play_date<=date_sub(cur_date() interval 30 days);
+
+
+13ans)
+
+select t.doctor_id,d.doctor_name,sum(t.cost)
+from doctors d join treatments t using(doctor_id)
+group by t.doctor_id ,d.doctor_name
+order by sum(t.cost) desc
+limit 5;
+
+
+14ans)
+
+select treatment_name,sum(cost),(sum(cost)/(select sum(cost) from treatments)*100) as percent_contribution
+from treatments 
+group by treatment_name with rollup;
+
+
+
+15ans)
+
+select patient_id,patient_name,admission_date,discharge_date
+from patients
+where datediff(admission_date,lag() over(partition by patient_id,patient_name))<=30
+order by admission_date asc;
+
+	
+
+16ans)
+
+select gender,diagnosis,round(avg(datediff(discharge_date,admission_date)),0)
+from patients
+group by gender,diagnosis;
+
+
+
+17ans)
+
+select c.department,e.semester,avg(e.grade)
+from courses c join enrollments e using(course_id)
+group by c.department,e.semester
+order by c.department,e.semester;
+
+
+
+18ans)
+
+select major,count(student_id) as no_of_students_enrolled,enrollment_year
+from students
+group by major,enrollment_year
+order by count(student_id) desc;
+
+
+
+19ans)
+
+select group_concat(s.student_id),group_concat(s.student_name),e.semester,sum(c.credits)
+from students s join enrollments e using(student_id) join courses c using(course_id)
+group by e.semester having sum(c.credits)>=50;
+
+
+20ans)
+
+select c.course_name,enrollment_year,count(student_id)
+from courses c join enrollments e using(course_id) join students s using(student_id)
+group by c.course_name,enrollment_year
+order by count(student_id) desc
+limit 3;
+
+
+
+
+
